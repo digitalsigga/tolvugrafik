@@ -7,7 +7,7 @@
 var gl;
 var points;
 
-var NumPoints = 10000;
+var NumPoints = 400;
 var colorLoc;
 
 window.onload = function init()
@@ -22,40 +22,50 @@ window.onload = function init()
     //
 
     // First, initialize the corners of our gasket with three points.
-    
-    var vertices = [
-        vec2( -1, -1 ),
-        vec2(  0,  1 ),
-        vec2(  1, -1 )
-    ];
+    var vertices = new Float32Array([ 0.0, 0.0
+        ]);
+    //  Configure WebGL
 
-    // Specify a starting point p for our iterations
-    // p must lie inside any set of three vertices
-    
-    var u = add( vertices[0], vertices[1] );
-    var v = add( vertices[0], vertices[2] );
-    var p = scale( 0.25, add( u, v ) );
+    var newVertices = [];
 
-    // And, add our initial point into our array of points
-    
-    points = [ p ];
-    
-    // Compute new points
-    // Each new point is located midway between
-    // last point and a randomly chosen vertex
-
-    for ( var i = 0; points.length < NumPoints; ++i ) {
-        var j = Math.floor(Math.random() * 3);
-        p = add( points[i], vertices[j] );
-        p = scale( 0.5, p );
-        points.push( p );
+     for (var i = 0; i < NumPoints; ++i) {
+        //var random = Math.random();
+        for (var j = 0; j < vertices.length; ++j) {
+            //newVertices.push(vertices[j] + Math.random());
+            newVertices.push(vertices[j] + Math.random() * 2 - 1);
+        }
     }
 
-    //
-    //  Configure WebGL
-    //
+    var triangles = [];
+
+    var triangles = [];
+var r = 0.1; // radius; you can adjust this value as needed
+
+//Búa til þríhyrninga í kringum punktana
+
+for (var i = 0; i < newVertices.length; i += 2) {
+    var x = newVertices[i];
+    var y = newVertices[i + 1];
+
+    // First vertex
+    var x1 = x + r * Math.cos(Math.PI / 2);
+    var y1 = y + r * Math.sin(Math.PI / 2);
+
+    // Second vertex
+    var x2 = x + r * Math.cos(7 * Math.PI / 6);
+    var y2 = y + r * Math.sin(7 * Math.PI / 6);
+
+    // Third vertex
+    var x3 = x + r * Math.cos(11 * Math.PI / 6);
+    var y3 = y + r * Math.sin(11 * Math.PI / 6);
+
+    // Push the vertices into the triangles array
+    triangles.push(x1, y1, x2, y2, x3, y3);
+}
+    var triangles = new Float32Array(triangles); 
+
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.clearColor( 0.9, 1.0, 1.0, 1.0 );
     
     //  Load shaders and initialize attribute buffers
     
@@ -66,7 +76,7 @@ window.onload = function init()
     
     var bufferId = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(triangles), gl.STATIC_DRAW );
 
     // Associate shader variables with our data buffer
     
@@ -76,20 +86,16 @@ window.onload = function init()
 
     // Find the location of the variable fColor in the shader program
     colorLoc = gl.getUniformLocation( program, "fColor" );
-    
-    render();
-};
 
+    render();
+}
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
-	// Setjum litinn sem rauðann og teiknum helming punktanna
-    gl.uniform4fv( colorLoc, vec4(1.0, 0.0, 0.0, 1.0) );
-    gl.drawArrays( gl.POINTS, 0, points.length/2 );
-
-	// Setjum litinn sem bláann og teiknum helming punktanna
-    gl.uniform4fv( colorLoc, vec4(0.0, 0.0, 1.0, 1.0) );
-    gl.drawArrays( gl.POINTS, points.length/2, points.length/2 );
+    for (var i = 0; i < NumPoints; i += 3) {
+        gl.uniform4fv(colorLoc, new Float32Array([Math.random(), Math.random(), Math.random(), 1]));
+        gl.drawArrays(gl.TRIANGLES, i, 3);
+    }
 
 }
