@@ -1,79 +1,72 @@
-"use strict";
-
 var gl;
 var points;
-
-var NumPoints = 100;
 
 window.onload = function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
-
+    
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    //
-    //  Initialize our data for the Sierpinski Gasket
-    //
-
-    // First, initialize the corners of our gasket with three points.
-
-    var vertices = [
-        vec2( -1, -1 ),
-        vec2(  0,  1 ),
-        vec2(  1, -1 )
-    ];
-
-    // Specify a starting point p for our iterations
-    // p must lie inside any set of three vertices
-
-    var u = add( vertices[0], vertices[1] );
-    var v = add( vertices[0], vertices[2] );
-    //var p = scale( 0.25, add( u, v ) ); // setja 100,100
-    var p = vec2( 100, 100 );
-    // And, add our initial point into our array of points
-
-    points = [p];
-
-    // Compute new points
-    // Each new point is located midway between
-    // last point and a randomly chosen vertex
-
-    for ( var i = 0; points.length < NumPoints; ++i ) {
-        var j = Math.floor(Math.random() * 3);
-        p = add( points[i], vertices[j] );
-        p = scale( 0.5, p );
-        points.push( p );
-    }
-
-    //
     //  Configure WebGL
-    //
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
-
+    gl.clearColor( 0.95, 1.0, 1.0, 1.0 );
+    
+    //  Generate vertices for Sierpinski Carpet
+    var vertices = [];
+    divideSquare(vertices, -1, 1, 2, 4); // Let's start with 3 iterations.
+    var verticesFloat32Array = new Float32Array(vertices);
+    
     //  Load shaders and initialize attribute buffers
-
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
-
+    
     // Load the data into the GPU
-
     var bufferId = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, verticesFloat32Array, gl.STATIC_DRAW ); // Use verticesFloat32Array
 
-    // Associate out shader variables with our data buffer
-
+    // Associate our shader variables with our data buffer
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    render();
+    render(verticesFloat32Array);  // Pass verticesFloat32Array as an argument
 };
 
+function divideSquare(vertices, x, y, length, n) {
+    if (n === 0) {
+        // Finna hornin
+        var squareVertices = [
+            x, y, // top left
+            x + length, y, // top right
+            x, y - length, // bottom left
+            x + length, y - length // bottom right
+        ];
 
-function render() {
-    gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays( gl.POINTS, 0, points.length );
+        // Append square vertices to the vertices array.
+        for (var i = 0; i < squareVertices.length; i++) {
+            vertices.push(squareVertices[i]);
+        }
+        return;
+    }
+
+    var subLength = length / 3;
+    for (var dx = 0; dx < 3; dx++) {
+        for (var dy = 0; dy < 3; dy++) {
+            // Skip the middle square
+            if (dx === 1 && dy === 1) continue;
+
+            // Generate vertices for the smaller square
+            divideSquare(vertices, x + dx * subLength, y - dy * subLength, subLength, n - 1);
+        }
+    }
+}
+
+ 
+function render(verticesFloat32Array) {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    for (var i = 0; i < verticesFloat32Array.length / 8; i++) {
+        gl.drawArrays(gl.TRIANGLE_STRIP, i * 4, 4);
+    }
 }
