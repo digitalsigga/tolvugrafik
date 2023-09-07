@@ -1,8 +1,7 @@
 /////////////////////////////////////////////////////////////////
-//    Sýnidæmi í Tölvugrafík
-//     Sýnir hvernig hægt er að breyta lit með uniform breytu
+//    Frogger
 //
-//    Hjálmtýr Hafsteinsson, ágúst 2023
+//    Sigríður Birna Matthíasdóttir, 2023
 /////////////////////////////////////////////////////////////////
 
 var gl;
@@ -13,8 +12,8 @@ var vPosition;
 
 var colorLoc;
 var offsetLoc;
-var trianglePosition = [0.0, -0.9]; // Initial position of the triangle
-var offset = [0,0];
+var trianglePosition = [0.0, 0.0]; // Initial position of the triangle
+var offset = [0,-0.9];
 
 
 window.onload = function init()
@@ -26,9 +25,9 @@ window.onload = function init()
 
     // Initialize the vertices for a smaller triangle positioned at the bottom
     var triangle = new Float32Array([
-        -0.05, -1,  // Bottom-left vertex
-         0.05, -1,  // Bottom-right vertex
-         0.0, -0.9  // Top vertex
+        -0.05, -0.1,  // Bottom-left vertex
+         0.05, -0.1,  // Bottom-right vertex
+         0.0, 0.0  // Top vertex
     ]);
 
     var safespace = new Float32Array([
@@ -49,8 +48,6 @@ window.onload = function init()
          1, -1,  // Top vertex
          
     ]);
-
-    //var triangles = new Float32Array(vertices);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.9, 1.0, 1.0, 1.0 );
@@ -85,19 +82,29 @@ window.onload = function init()
 }
 
 window.addEventListener("keydown", function (event) {
+    const stepSize = 0.05;
+    
     switch (event.code) {
         case "ArrowUp":
-            offset[1] += 0.05;
-            console.log('hi');
-            break;
+            if (offset[1] + stepSize <= 1.0) { // Check top boundary
+                console.log(offset);
+                offset[1] += 0.1;
+                break;
+            }
         case "ArrowDown":
-            offset[1] -= 0.05;
+            if (offset[1] - stepSize >= -1.0) { // Check bottom boundary
+                offset[1] -= stepSize;
+            }
             break;
         case "ArrowLeft":
-            offset[0] -= 0.05;
+            if (offset[0] - stepSize >= -1.0) { // Check left boundary
+                offset[0] -= 0.1;
+            }
             break;
         case "ArrowRight":
-            offset[0] += 0.05;
+            if (offset[0] + stepSize <= 1.0) { // Check right boundary
+                offset[0] += stepSize;
+            }
             break;
     }
     // render(); // Update and render on key press
@@ -107,7 +114,7 @@ window.addEventListener("keydown", function (event) {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-        // Draw the safe space
+     // Draw the safe space
         gl.uniform4fv(offsetLoc, new Float32Array([0, 0, 0.0, 0.0]));
         gl.uniform4fv(colorLoc, new Float32Array([1.0, 1.0, 0.0, 1.0]));
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferSafespace);
@@ -116,28 +123,13 @@ function render() {
         gl.drawArrays(gl.TRIANGLE_FAN, 4, 4);
         gl.drawArrays(gl.TRIANGLE_FAN, 8, 4);
 
-
-    // gl.uniform4fv(offsetLoc, new Float32Array([0, 0, 0.0, 0.0]));
-    // gl.uniform4fv(colorLoc, new Float32Array([1.0, 1.0, 0.0, 1.0]));
-    // gl.bindBuffer(gl.ARRAY_BUFFER, bufferSafespace);
-    // gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-
-    // Set the position of the triangle
-    // var translatedVertices = new Float32Array([
-    //     -0.05 + trianglePosition[0], -1.0 + trianglePosition[1],
-    //     0.05 + trianglePosition[0], -1.0 + trianglePosition[1],
-    //     0.0 + trianglePosition[0], -0.9 + trianglePosition[1]
-    // ]);
-
+    // Draw frog  
     gl.uniform4fv(offsetLoc, new Float32Array([offset[0], offset[1], 0.0, 0.0]));
     gl.uniform4fv(colorLoc, new Float32Array([0.0, 1.0, 0.0, 1.0]));
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferTriangle);
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    // gl.bufferData(gl.ARRAY_BUFFER, translatedVertices, gl.STATIC_DRAW);
-
-    //gl.uniform4fv(offsetLoc, new Float32Array([offset[0], offset[1], 0.0, 0.0]));
     window.requestAnimationFrame(render);
 
 }
