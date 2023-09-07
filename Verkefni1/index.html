@@ -6,12 +6,13 @@
     <title>T-shape-strip</title>
     <script id="vertex-shader" type="x-shader/x-vertex">
     attribute vec4 vPosition;
+    uniform vec4 offset;
 
     void
     main()
     {
         gl_PointSize = 1.0;
-        gl_Position = vPosition;
+        gl_Position = vPosition + offset;
     }
     </script>
     
