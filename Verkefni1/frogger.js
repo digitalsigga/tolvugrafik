@@ -17,52 +17,14 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    //
-    //  Initialize our data for the Sierpinski Gasket
-    //
+    // Initialize the vertices for a smaller triangle positioned at the bottom
+    var vertices = new Float32Array([
+        -0.05, -1,  // Bottom-left vertex
+         0.05, -1,  // Bottom-right vertex
+         0.0, -0.9 // Top vertex
+    ]);
 
-    // First, initialize the corners of our gasket with three points.
-    var vertices = new Float32Array([ 0.0, 0.0
-        ]);
-    //  Configure WebGL
-
-    var newVertices = [];
-
-     for (var i = 0; i < NumPoints; ++i) {
-        //var random = Math.random();
-        for (var j = 0; j < vertices.length; ++j) {
-            //newVertices.push(vertices[j] + Math.random());
-            newVertices.push(vertices[j] + Math.random() * 2 - 1);
-        }
-    }
-
-    var triangles = [];
-
-    var triangles = [];
-var r = 0.1; // radius; you can adjust this value as needed
-
-//Búa til þríhyrninga í kringum punktana
-
-for (var i = 0; i < newVertices.length; i += 2) {
-    var x = newVertices[i];
-    var y = newVertices[i + 1];
-
-    // First vertex
-    var x1 = x + r * Math.cos(Math.PI / 2);
-    var y1 = y + r * Math.sin(Math.PI / 2);
-
-    // Second vertex
-    var x2 = x + r * Math.cos(7 * Math.PI / 6);
-    var y2 = y + r * Math.sin(7 * Math.PI / 6);
-
-    // Third vertex
-    var x3 = x + r * Math.cos(11 * Math.PI / 6);
-    var y3 = y + r * Math.sin(11 * Math.PI / 6);
-
-    // Push the vertices into the triangles array
-    triangles.push(x1, y1, x2, y2, x3, y3);
-}
-    var triangles = new Float32Array(triangles); 
+    var triangles = new Float32Array(vertices);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.9, 1.0, 1.0, 1.0 );
@@ -94,8 +56,8 @@ function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
 
     for (var i = 0; i < NumPoints; i += 3) {
-        gl.uniform4fv(colorLoc, new Float32Array([Math.random(), Math.random(), Math.random(), 1]));
-        gl.drawArrays(gl.TRIANGLES, i, 3);
+        gl.uniform4fv(colorLoc, new Float32Array([0.0, 1.0, 0.0, 1.0]));
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
 }
