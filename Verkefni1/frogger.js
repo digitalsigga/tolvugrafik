@@ -164,7 +164,7 @@ function areRectanglesColliding(A, B) {
             A.y + A.height > B.y);
 }
 
-let score = 3;  // Initialize score to 0
+let score = 0;  // Initialize score to 0
 
 function updateScore(value) {
     score += value;  // Increase the score by the given value
