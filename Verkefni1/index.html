@@ -6,13 +6,23 @@
     <title>T-shape-strip</title>
     <script id="vertex-shader" type="x-shader/x-vertex">
     attribute vec4 vPosition;
+    uniform float rotation;
     uniform vec4 offset;
 
     void
     main()
     {
         gl_PointSize = 1.0;
-        gl_Position = vPosition + offset;
+        
+        float s = sin(rotation);
+        float c = cos(rotation);
+        mat2 rotationMatrix = mat2(c, -s, s, c);
+        
+        // Applying the rotation
+        vec2 rotatedPosition = rotationMatrix * vPosition.xy;
+        
+        // Applying the offset after the rotation
+        gl_Position = vec4(rotatedPosition + offset.xy, 0.0, 1.0);
     }
     </script>
     
@@ -36,4 +46,5 @@
     <body>
         <canvas id="gl-canvas" width="512" height="512"></canvas>
     </body>
+    <div id="scoreBoard">Score: 0</div>
 </html>
