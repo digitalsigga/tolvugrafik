@@ -28,14 +28,14 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    // Initialize the vertices for a smaller triangle positioned at the bottom
+    // Initialize the vertices for fríða the frog
     var triangle = new Float32Array([
         -0.05, -0.1,  // Bottom-left vertex
          0.05, -0.1,  // Bottom-right vertex
          0.0, 0.0  // Top vertex
     ]);
 
-    // Initialize the vertices for a smaller triangle positioned at the bottom
+    // Initialize the vertices for cars
     var cars = new Float32Array([
         -0.1, 0.7,  // 
         -0.1, 0.6,  
@@ -104,8 +104,6 @@ window.onload = function init()
     // Find the location of the variable fColor in the shader program
     colorLoc = gl.getUniformLocation( program, "fColor" );
     offsetLoc = gl.getUniformLocation( program, "offset" );
-
-    // Initial rotation angle
   
     displayScore();  // Initialize the score display
 
@@ -164,7 +162,7 @@ function areRectanglesColliding(A, B) {
             A.y + A.height > B.y);
 }
 
-let score = 0;  // Initialize score to 0
+let score = 6;  // Initialize score to 0
 
 function updateScore(value) {
     score += value;  // Increase the score by the given value
@@ -225,15 +223,14 @@ function render() {
             const carBoundingBox = {
                 x: -0.1 + carX,
                 y: 0.6 + carY,
-                width: 0.2,  // width of the car (assumed value based on standard rectangle, modify if necessary)
-                height: 0.1  // height of the car (assumed value based on standard rectangle, modify if necessary)
+                width: 0.2,  // width of the car
+                height: 0.1  // height of the car 
             };
             
             if (areRectanglesColliding(frogBoundingBox, carBoundingBox)) {
                 console.table([frogBoundingBox, carBoundingBox]);  // Handle game over scenario here
                 offset = [0,-0.9];
-                //isGameOver = true;
-            // Exit render loop (or handle this differently based on game mechanics)
+
             }
 
             gl.uniform4fv(offsetLoc, new Float32Array([carX, carY, 0.0, 0.0]));
