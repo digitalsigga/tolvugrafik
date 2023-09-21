@@ -1,53 +1,53 @@
-<html><head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Fallandi punktar</title>
-    
-    <script id="vertex-shader" type="x-shader/x-vertex">
-    uniform float time;
-    attribute vec4 vPosition;
-    attribute vec4 aPosition;
-    varying vec4 vColor;
-
-    
-    void main()
-    {
-        gl_PointSize = 3.0;
-        vec4 tpos = vPosition;
+    <html><head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <title>Fallandi punktar</title>
         
-        tpos.y = 1.0 - mod(0.0015*time + tpos.y+1.0, 2.0);
-        float distFromCenter = length(tpos.xy);
+        <script id="vertex-shader" type="x-shader/x-vertex">
+        uniform float time;
+        attribute vec4 vPosition;
+        attribute vec4 aPosition;
+        varying vec4 vColor;
+    
         
-        // Check if the point (with modified y-position) is inside the circle of radius 0.5
-        if (((distFromCenter <= 0.5 && tpos.y > 0.0) || distFromCenter > 0.5 && tpos.y < 0.0) ) {
-            // Discard the point
-            vColor = vec4(1.0, 0.0, 0.0, 1.0);  // Position it outside the clip space
-        } else {
-            vColor = vec4(1.0, 1.0, 1.0, 1.0);  // Set color to red
-              // Use the modified position
+        void main()
+        {
+            gl_PointSize = 3.0;
+            vec4 tpos = vPosition;
+            
+            tpos.y = 1.0 - mod(0.0015*time + tpos.y+1.0, 2.0);
+            float distFromCenter = length(tpos.xy);
+            
+            // Check if the point (with modified y-position) is inside the circle of radius 0.5
+            if (((distFromCenter <= 0.5 && tpos.y > 0.0) || distFromCenter > 0.5 && tpos.y < 0.0) ) {
+                // Discard the point
+                vColor = vec4(1.0, 0.0, 0.0, 1.0);  // Position it outside the clip space
+            } else {
+                vColor = vec4(1.0, 1.0, 1.0, 1.0);  // Set color to red
+                  // Use the modified position
+            }
+    
+            gl_Position = tpos; 
         }
-
-        gl_Position = tpos; 
-    }
-    </script>
-    
-    <script id="fragment-shader" type="x-shader/x-fragment">
-    precision mediump float;
-    varying vec4 vColor;
-    
-    void main()
-    {
-        gl_FragColor = vColor;
-    }
-    </script>
-    
-    <script type="text/javascript" src="Common/webgl-utils.js"></script>
-    <script type="text/javascript" src="Common/initShaders.js"></script>
-    <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="falling-flag.js"></script>
-    </head>
-    
-    <body>
-    <canvas id="gl-canvas" width="600" height="600">
-    
-    
-    </canvas></body></html>
+        </script>
+        
+        <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+        varying vec4 vColor;
+        
+        void main()
+        {
+            gl_FragColor = vColor;
+        }
+        </script>
+        
+        <script type="text/javascript" src="Common/webgl-utils.js"></script>
+        <script type="text/javascript" src="Common/initShaders.js"></script>
+        <script type="text/javascript" src="Common/MV.js"></script>
+        <script type="text/javascript" src="falling-flag.js"></script>
+        </head>
+        
+        <body>
+        <canvas id="gl-canvas" width="600" height="600">
+        
+        
+        </canvas></body></html>

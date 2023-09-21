@@ -5,7 +5,6 @@
     <script id="vertex-shader" type="x-shader/x-vertex">
     uniform float time;
     attribute vec4 vPosition;
-    attribute vec4 aPosition;
     varying vec4 vColor;
 
     
@@ -15,15 +14,15 @@
         vec4 tpos = vPosition;
         
         tpos.y = 1.0 - mod(0.0015*time + tpos.y+1.0, 2.0);
-        float distFromCenter = length(tpos.xy);
         
-        // Check if the point (with modified y-position) is inside the circle of radius 0.5
-        if (((distFromCenter <= 0.5 && tpos.y > 0.0) || distFromCenter > 0.5 && tpos.y < 0.0) ) {
-            // Discard the point
-            vColor = vec4(1.0, 0.0, 0.0, 1.0);  // Position it outside the clip space
-        } else {
-            vColor = vec4(1.0, 1.0, 1.0, 1.0);  // Set color to red
-              // Use the modified position
+        vColor = vec4(0.0, 0.0, 1.0, 1.0); 
+        float crossWhite= 0.14; 
+        float crossRed= 0.07; 
+
+        if (abs(tpos.x) < crossRed || abs(tpos.y) < crossRed) {
+            vColor = vec4(1.0, 0.0, 0.0, 1.0);  // Red
+        } else if (abs(tpos.x) < crossWhite || abs(tpos.y) < crossWhite) {
+            vColor = vec4(1.0, 1.0, 1.0, 1.0);  // White
         }
 
         gl_Position = tpos; 
@@ -43,7 +42,7 @@
     <script type="text/javascript" src="Common/webgl-utils.js"></script>
     <script type="text/javascript" src="Common/initShaders.js"></script>
     <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="falling-flag.js"></script>
+    <script type="text/javascript" src="falling-islenski.js"></script>
     </head>
     
     <body>
