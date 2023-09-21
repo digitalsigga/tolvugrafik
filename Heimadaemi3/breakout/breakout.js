@@ -29,8 +29,10 @@ var bufferBox;
 var bufferPad;
 var vPosition;
 var xmove = 0.0;
+var colorLoc;
 
 window.onload = function init() {
+
 
     canvas = document.getElementById( "gl-canvas" );
     
@@ -38,11 +40,11 @@ window.onload = function init() {
     if ( !gl ) { alert( "WebGL isn't available" ); }
     
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
+    gl.clearColor( 0.5, 0.0, 0.5, 0.5 );
     
     // Gefa ferningnum slembistefnu í upphafi
-    dX = Math.random()*0.1-0.05 * 0.5;
-    dY = Math.random()*0.1-0.05 * 0.5;
+    dX = (Math.random()*0.1-0.05)*0.2;
+    dY = (Math.random()*0.1-0.05)*0.2;
 
 
     // Gera kassi
@@ -84,6 +86,7 @@ window.onload = function init() {
 
     // Meðhöndlun örvalykl
 
+    colorLoc = gl.getUniformLocation( program, "fColor" );
 
     // Event listener for keyboard
     window.addEventListener("keydown", function(e){
@@ -108,6 +111,8 @@ window.onload = function init() {
 
 
 function render() {
+
+    gl.uniform4fv(colorLoc, new Float32Array([0.5, 0.50, 0.0, 1.0]));
     
     // Láta ferninginn skoppa af veggjunum
     if (Math.abs(box[0] + dX) > maxX - boxRad) dX = -dX;
@@ -131,6 +136,9 @@ function render() {
         dX = -dX
         dY = -dY
     }
+
+    gl.uniform4fv(colorLoc, new Float32Array([0.0, 0.50, 0.8, 1.0]));
+
     gl.uniform2fv( locBox, flatten([xmove, -0.9]));
     gl.bindBuffer( gl.ARRAY_BUFFER, bufferPad );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
