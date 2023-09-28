@@ -1,0 +1,52 @@
+<html><head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Fallandi punktar</title>
+    
+    <script id="vertex-shader" type="x-shader/x-vertex">
+    uniform float time;
+    attribute vec4 vPosition;
+    attribute vec4 aPosition;
+    varying vec4 vColor;
+
+    
+    void main()
+    {
+        gl_PointSize = 3.0;
+        vec4 tpos = vPosition;
+        
+        tpos.y = 1.0 - mod(0.0015*time + tpos.y+1.0, 2.0);
+        float crossTolerance = 0.05;  // Tolerance for the width of the cross
+    
+    
+        // If the point is on the vertical or horizontal line of the cross
+        if (abs(tpos.x) < crossTolerance || abs(tpos.y) < crossTolerance) {
+            vColor = vec4(1.0, 0.0, 0.0, 1.0);  // Red for the cross
+        } else {
+            vColor = vec4(0.0, 0.0, 1.0, 1.0);  // Blue for everything else
+        }
+
+        gl_Position = tpos; 
+    }
+    </script>
+    
+    <script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec4 vColor;
+    
+    void main()
+    {
+        gl_FragColor = vColor;
+    }
+    </script>
+    
+    <script type="text/javascript" src="Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="Common/initShaders.js"></script>
+    <script type="text/javascript" src="Common/MV.js"></script>
+    <script type="text/javascript" src="falling-flag.js"></script>
+    </head>
+    
+    <body>
+    <canvas id="gl-canvas" width="600" height="600">
+    
+    
+    </canvas></body></html>

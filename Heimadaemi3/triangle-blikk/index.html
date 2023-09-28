@@ -24,8 +24,8 @@
     void
     main()
     {
-        float blinkFactor = abs(sin(time)); // Create a blinking effect using sine function
-        vec4 mixedColor = mix(color1, color2, blinkFactor); // Interpolate between the two colors
+        float blinkFactor = abs(sin(time)); //
+        vec4 mixedColor = mix(color1, color2, blinkFactor);
         gl_FragColor = mixedColor;
     }
     </script>
