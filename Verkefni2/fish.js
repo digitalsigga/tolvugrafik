@@ -14,6 +14,9 @@ var NumBody = 6;
 var NumTail = 3;
 var NumUgg = 3;
 
+var offsetLoc;
+var offset = [0,-0.9];
+
 
 // Hn�tar fisks � xy-planinu
 var vertices = [
@@ -159,41 +162,50 @@ function render()
     if( rotTail > 35.0  || rotTail < -35.0 )
         incTail *= -1;
 
+        const time = Date.now();
+
+
+    for(let i =0; i < 3; i++) { // Ytri lykkja, reyna fá þá til að hreyfast
+        let direction = Math.random() % 3 === 0 ? -1 : 1;
+        for (let i = 0; i < fish_loc.length; ++i) { // Innri lykkja teikna öll elements hvers fisks og jafn mörg og fish loc 
+            gl.uniform4fv( colorLoc, fish_col[i] );
+            // Teikna l�kama fisks (�n sn�nings)
+            let fishX = direction*((0.7 * i + time) % 2.4 - 1.2);
+            let fishY = Math.random() * -0.27;
+            gl.uniform4fv(offsetLoc, new Float32Array([fishX, fishY, 0.0, 0.0]));
+
+        
+            mv = mult(mv, translate(fish_loc[i]))
+            gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+            gl.drawArrays( gl.TRIANGLES, 0, NumBody );
     
-    for (let i = 0; i < fish_loc.length; ++i) {
-        gl.uniform4fv( colorLoc, fish_col[i] );
-        // Teikna l�kama fisks (�n sn�nings)
-        mv = mult(mv, translate(fish_loc[i]))
-        gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
-        gl.drawArrays( gl.TRIANGLES, 0, NumBody );
-    
-        // Teikna spor� og sn�a honum
-        let mvs = mult( mv, translate ( -0.5, 0.0, 0.0 ) );
-        mvs = mult( mvs, rotateY( rotTail ) );
+            // Teikna spor� og sn�a honum
+            let mvs = mult( mv, translate ( -0.5, 0.0, 0.0 ) );
+         mvs = mult( mvs, rotateY( rotTail ) );
         mvs = mult( mvs, translate ( 0.5, 0.0, 0.0 ) );
         
-        gl.uniformMatrix4fv(mvLoc, false, flatten(mvs));
-        gl.drawArrays( gl.TRIANGLES, NumBody, NumTail);
+         gl.uniformMatrix4fv(mvLoc, false, flatten(mvs));
+            gl.drawArrays( gl.TRIANGLES, NumBody, NumTail);
     
-        // Teikna ugg og sn�a honum
+            // Teikna ugg og sn�a honum
         // To rotate the ugg, modify the model-view matrix here.
-        let mvu = mult( mv, rotateY(90 - rotUgg) );
-        mvu = mult( mvu, translate ( 0.1, 0.0, 0.0 ) );
+            let mvu = mult( mv, rotateY(90 - rotUgg) );
+            mvu = mult( mvu, translate ( 0.1, 0.0, 0.0 ) );
         // gl.uniform4fv( colorLoc, fish_col[i] );
-        gl.uniform4fv( colorLoc, fish_col[i].map(c => c -0.3) );
+            gl.uniform4fv( colorLoc, fish_col[i].map(c => c -0.3) );
 
-        gl.uniformMatrix4fv(mvLoc, false, flatten(mvu));
+            gl.uniformMatrix4fv(mvLoc, false, flatten(mvu));
         
-        gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
+            gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
     
         // let mvuMirror = mult( mv, scalem(1, -1, 1) ); // mirror across the Y-axis
-        let mvuMirror = mult( mv, rotateY(270 + rotUgg) );
-        mvuMirror = mult( mvuMirror, translate ( 0.1, 0.0, 0.0 ) );
+            let mvuMirror = mult( mv, rotateY(270 + rotUgg) );
+            mvuMirror = mult( mvuMirror, translate ( 0.1, 0.0, 0.0 ) );
         //gl.uniform4fv( colorLoc, vec4(0.10, 1.0, 0.9, 1.0) );
-        gl.uniformMatrix4fv(mvLoc, false, flatten(mvuMirror));
-        gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
+            gl.uniformMatrix4fv(mvLoc, false, flatten(mvuMirror));
+            gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
+        }
     }
-
 
     requestAnimFrame( render );
 }
