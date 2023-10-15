@@ -63,6 +63,11 @@ let fish_col = new Array(fish_loc.length).fill(null).map(_=> {
     return vec4(Math.random(), Math.random(), Math.random(), 1.0)
 }) 
 
+let fish_move = new Array(fish_loc.length).fill(null).map(_=> {
+    return vec3(0.02*(2*Math.random() - 1, 2*Math.random() +  1, 2*Math.random() +1))
+}) 
+
+
 window.onload = function init()
 {
     canvas = document.getElementById( "gl-canvas" );
@@ -164,18 +169,19 @@ function render()
 
         const time = Date.now();
 
-
-    for(let i =0; i < 3; i++) { // Ytri lykkja, reyna fá þá til að hreyfast
-        let direction = Math.random() % 3 === 0 ? -1 : 1;
         for (let i = 0; i < fish_loc.length; ++i) { // Innri lykkja teikna öll elements hvers fisks og jafn mörg og fish loc 
-            gl.uniform4fv( colorLoc, fish_col[i] );
+            gl.uniform4fv(colorLoc, fish_col[i] );
             // Teikna l�kama fisks (�n sn�nings)
-            let fishX = direction*((0.7 * i + time) % 2.4 - 1.2);
-            let fishY = Math.random() * -0.27;
-            gl.uniform4fv(offsetLoc, new Float32Array([fishX, fishY, 0.0, 0.0]));
+                   fish_loc[i] = add(fish_loc[i], fish_move[i]);
 
+        // Ensure fish does not go too far away, if it does, invert direction
+        for (let j = 0; j < 3; j++) {
+            if (Math.abs(fish_loc[i][j]) > 10) {
+                fish_move[i][j] *= -1; 
+            }
+        }
         
-            mv = mult(mv, translate(fish_loc[i]))
+            mv = mult(mv, translate(add(fish_loc[i], fish_move[i])))
             gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
             gl.drawArrays( gl.TRIANGLES, 0, NumBody );
     
@@ -205,7 +211,6 @@ function render()
             gl.uniformMatrix4fv(mvLoc, false, flatten(mvuMirror));
             gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
         }
-    }
 
     requestAnimFrame( render );
 }
