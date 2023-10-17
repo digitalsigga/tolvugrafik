@@ -64,8 +64,9 @@ let fish_col = new Array(fish_loc.length).fill(null).map(_=> {
 }) 
 
 let fish_move = new Array(fish_loc.length).fill(null).map(_=> {
-    return vec3(0.02*(2*Math.random() - 1, 2*Math.random() +  1, 2*Math.random() +1))
+    return vec3(0.002*(2*Math.random()-1, 2*Math.random()-1, 2*Math.random() -1))
 }) 
+
 
 
 window.onload = function init()
@@ -75,8 +76,9 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
+
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.95, 1.0, 1.0, 1.0 );
+    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
  
     gl.enable(gl.DEPTH_TEST);
  
@@ -87,6 +89,10 @@ window.onload = function init()
     gl.useProgram( program );
     
     var vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
+
+    var burBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
 
@@ -172,42 +178,42 @@ function render()
         for (let i = 0; i < fish_loc.length; ++i) { // Innri lykkja teikna öll elements hvers fisks og jafn mörg og fish loc 
             gl.uniform4fv(colorLoc, fish_col[i] );
             // Teikna l�kama fisks (�n sn�nings)
-                   fish_loc[i] = add(fish_loc[i], fish_move[i]);
+            fish_loc[i] = add(fish_loc[i], fish_move[i]);
 
         // Ensure fish does not go too far away, if it does, invert direction
         for (let j = 0; j < 3; j++) {
-            if (Math.abs(fish_loc[i][j]) > 10) {
-                fish_move[i][j] *= -1; 
+            if (fish_loc[i][j] > 1) {
+                fish_loc[i][j] = -1; 
+            }
+            if (fish_loc[i][j] < -1) {
+                fish_loc[i][j] = 1; 
             }
         }
         
-            mv = mult(mv, translate(add(fish_loc[i], fish_move[i])))
+            mv = mult(mv, translate(fish_loc[i]))
             gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
             gl.drawArrays( gl.TRIANGLES, 0, NumBody );
     
             // Teikna spor� og sn�a honum
             let mvs = mult( mv, translate ( -0.5, 0.0, 0.0 ) );
-         mvs = mult( mvs, rotateY( rotTail ) );
-        mvs = mult( mvs, translate ( 0.5, 0.0, 0.0 ) );
+            mvs = mult( mvs, rotateY( rotTail ) );
+            mvs = mult( mvs, translate ( 0.5, 0.0, 0.0 ) );
         
-         gl.uniformMatrix4fv(mvLoc, false, flatten(mvs));
+            gl.uniformMatrix4fv(mvLoc, false, flatten(mvs));
             gl.drawArrays( gl.TRIANGLES, NumBody, NumTail);
     
             // Teikna ugg og sn�a honum
-        // To rotate the ugg, modify the model-view matrix here.
+            // To rotate the ugg, modify the model-view matrix here.
             let mvu = mult( mv, rotateY(90 - rotUgg) );
             mvu = mult( mvu, translate ( 0.1, 0.0, 0.0 ) );
-        // gl.uniform4fv( colorLoc, fish_col[i] );
+            // gl.uniform4fv( colorLoc, fish_col[i] );
             gl.uniform4fv( colorLoc, fish_col[i].map(c => c -0.3) );
-
             gl.uniformMatrix4fv(mvLoc, false, flatten(mvu));
-        
             gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
-    
-        // let mvuMirror = mult( mv, scalem(1, -1, 1) ); // mirror across the Y-axis
+             // let mvuMirror = mult( mv, scalem(1, -1, 1) ); // mirror across the Y-axis
             let mvuMirror = mult( mv, rotateY(270 + rotUgg) );
             mvuMirror = mult( mvuMirror, translate ( 0.1, 0.0, 0.0 ) );
-        //gl.uniform4fv( colorLoc, vec4(0.10, 1.0, 0.9, 1.0) );
+            //gl.uniform4fv( colorLoc, vec4(0.10, 1.0, 0.9, 1.0) );
             gl.uniformMatrix4fv(mvLoc, false, flatten(mvuMirror));
             gl.drawArrays( gl.TRIANGLES, NumBody + NumTail, 3 );
         }
