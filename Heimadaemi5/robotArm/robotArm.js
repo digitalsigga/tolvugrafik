@@ -43,6 +43,8 @@ var LOWER_ARM_HEIGHT = 5.0;
 var LOWER_ARM_WIDTH  = 0.5;
 var UPPER_ARM_HEIGHT = 5.0;
 var UPPER_ARM_WIDTH  = 0.5;
+var TOP_ARM_HEIGHT = 2.0;
+var TOP_ARM_WIDTH  = 0.5;
 
 // Shader transformation matrices
 
@@ -53,9 +55,10 @@ var modelViewMatrix, projectionMatrix;
 var Base = 0;
 var LowerArm = 1;
 var UpperArm = 2;
+var TopArm = 3;
 
 
-var theta= [ 0, 0, 0];
+var theta= [0, 0, 0, 0,0];
 
 var angle = 0;
 
@@ -94,13 +97,13 @@ function colorCube() {
 
 // Remmove when scale in MV.js supports scale matrices
 
-function scale4(a, b, c) {
-   var result = mat4();
-   result[0][0] = a;
-   result[1][1] = b;
-   result[2][2] = c;
-   return result;
-}
+// function scale4(a, b, c) {
+//    var result = mat4();
+//    result[0][0] = a;
+//    result[1][1] = b;
+//    result[2][2] = c;
+//    return result;
+// }
 
 
 //--------------------------------------------------
@@ -203,6 +206,12 @@ window.onload = function init() {
             case 87:	// w - snýr efri armi
 			    theta[2] = Math.max(-170, theta[2]-5);
                 break;
+            case 69:	// e - snýr top armi
+			    theta[TopArm] = Math.min(170, theta[TopArm]+5);
+                break;
+            case 82:	// r - snýr top armi
+			    theta[TopArm] = Math.max(-170, theta[TopArm]-5);
+                break;
          }
      }  );  
 
@@ -257,8 +266,8 @@ function lowerArm()
 
 function topArm()
 {
-    var s = scalem(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH);
-    var instanceMatrix = mult( translate( 0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0 ), s);
+    var s = scalem(TOP_ARM_WIDTH, TOP_ARM_HEIGHT, TOP_ARM_WIDTH);
+    var instanceMatrix = mult( translate( 0.0, 0.5 * TOP_ARM_HEIGHT, 0.0 ), s);
     var t = mult(modelViewMatrix, instanceMatrix);
     gl.uniformMatrix4fv( modelViewMatrixLoc,  false, flatten(t) );
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
@@ -285,8 +294,8 @@ var render = function() {
     modelViewMatrix  = mult(modelViewMatrix, rotateZ( theta[UpperArm] ) );
     upperArm();
 
-    modelViewMatrix  = mult(modelViewMatrix, translate(0.0, LOWER_ARM_HEIGHT, 0.0));
-    modelViewMatrix  = mult(modelViewMatrix, rotateZ( theta[UpperArm] ) );
+    modelViewMatrix  = mult(modelViewMatrix, translate(0.0, UPPER_ARM_HEIGHT, 0.0));
+    modelViewMatrix  = mult(modelViewMatrix, rotateZ( theta[TopArm] ) );
     topArm();
 
     requestAnimFrame(render);
