@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <script id="vertex-shader" type="x-shader/x-vertex">
 
 attribute vec4 vPosition;
 attribute vec4 vNormal;
-varying vec3 N, L, E, R;
+varying vec3 N, L, E;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec4 lightPosition;
@@ -20,7 +21,6 @@ void main()
 
     E =  -normalize(pos);
     N = normalize( normalMatrix*vNormal.xyz);
-    R = 2.0*max( dot(L, N), 0.0)*N - L;
 
     gl_Position = projectionMatrix * modelViewMatrix * vPosition;
 
@@ -35,35 +35,30 @@ uniform vec4 ambientProduct;
 uniform vec4 diffuseProduct;
 uniform vec4 specularProduct;
 uniform float shininess;
-varying vec3 N, L, E, R;
-uniform bool phong;
+varying vec3 N, L, E;
 
 void main()
 {
     vec4 fColor;
 
-    vec3 H = normalize(normalize( L ) + normalize( E ));
+    vec3 H = normalize( L + E );
+
     vec4 ambient = ambientProduct;
-
-    float Kd = max( dot(normalize(L), normalize(N)), 0.0 );
-    vec4  diffuse = Kd*diffuseProduct;
-
-    float Ks;
-    if (!phong) {
-        Ks = pow( max(dot(E, R), 0.0), shininess );
-      } else {
-        Ks = pow(max( dot(normalize(N), H), 0.0 ),shininess);
-    }
-
-    vec4  specular = Ks * specularProduct;
-
+    vec4 diffuse = max( dot(L, N), 0.0 )*diffuseProduct;
+    vec4 specular = specularProduct * pow( max(dot(N, H), 0.0), shininess );
 
     if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-    fColor = ambient + diffuse +specular;
-    fColor.a = 1.0;
 
-    gl_FragColor = fColor;
+//  Throw away if too bright:
+    vec4 color = ambient + diffuse + specular;
+    color.a = 1.0;
+
+    if( length(color) > 1.2 )
+        discard;
+    else
+        gl_FragColor = color;
+
 }
 </script>
 
@@ -71,11 +66,9 @@ void main()
 <script type="text/javascript" src="Common/initShaders.js"></script>
 <script type="text/javascript" src="Common/MV.js"></script>
 <script type="text/javascript" src="teapotData.js"></script>
-<script type="text/javascript" src="PhongTepottur.js"></script>
+<script type="text/javascript" src="PhongTepotturTrans.js"></script>
 
 <body>
  <canvas id="gl-canvas" width="600" height="600">
- </canvas>
-    <input type="checkbox"/>
 </body>
 </html>

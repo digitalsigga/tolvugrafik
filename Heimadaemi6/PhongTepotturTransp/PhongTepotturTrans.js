@@ -46,16 +46,8 @@ var normalMatrix, normalMatrixLoc;
 var eye;
 var at = vec3(0.0, 0.0, 0.0);
 var up = vec3(0.0, 1.0, 0.0);
-var phongLoc;
-let phong = false;
-
 
 window.onload = function init() {
-
-    document.querySelector("input").addEventListener("click", e=>{
-        console.log(phong);
-        phong = !phong;
-     })
 
     canvas = document.getElementById( "gl-canvas" );
 
@@ -70,7 +62,7 @@ window.onload = function init() {
     gl.cullFace(gl.BACK);
 
 
-    var myTeapot = teapot(5);
+    var myTeapot = teapot(15);
     myTeapot.scale(0.5, 0.5, 0.5);
 
     console.log(myTeapot.TriangleVertices.length);
@@ -106,7 +98,6 @@ window.onload = function init() {
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
     normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
-    phongLoc = gl.getUniformLocation(program, "phong")
 
     projectionMatrix = perspective( fovy, 1.0, near, far );
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix) );
@@ -116,7 +107,6 @@ window.onload = function init() {
     gl.uniform4fv( gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
     gl.uniform4fv( gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
     gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess );
-
 
     //event listeners for mouse
     canvas.addEventListener("mousedown", function(e){
@@ -148,9 +138,6 @@ window.onload = function init() {
          }
      }  );
 
-
-
-
     render();
 }
 
@@ -158,7 +145,6 @@ window.onload = function init() {
 function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.uniform1i(phongLoc, phong)
 
     modelViewMatrix = lookAt( vec3(0.0, 0.0, zDist), at, up );
     modelViewMatrix = mult( modelViewMatrix, rotateY( -spinY ) );
